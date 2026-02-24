@@ -1,0 +1,82 @@
+<!-- <!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Web Development 2</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css')}}">
+</head>
+
+<body>
+    <header>
+
+        <title>
+            Expense Tracker
+        </title>
+
+        {% if g.user %}
+        <p>
+            User id: {{ g.user }}
+        </p>
+        <p>
+            <a href="{{ url_for('logout') }}">Logout</a>
+        </p>
+        {% else %}
+        <p>
+            <a href="{{ url_for('register') }}">Register</a>
+        </p>
+        <p>
+            <a href="{{ url_for('login') }}">Login</a>
+        </p>
+        {% endif %}
+
+    </header>
+
+   
+</body>
+
+</html> -->
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Expense Tracker</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css')}}">
+</head>
+
+<body>
+    <header>
+        <nav class="top-nav">
+            <ul>
+                <li><a href="{{ url_for('login') }}">Login</a></li>
+                <li><a href="{{ url_for('register') }}">Register</a></li>
+                <li><a href="{{ url_for('logout') }}">Log out</a></li>
+            </ul>
+        </nav>
+    </header>
+    <aside>
+        <h1>Expense Tracker</h1>
+        <nav>
+            <ul>
+                <li><a href="">Home</a></li>
+                <li><a href="index.html">Add Transaction</a></li>
+                <li><a href="">All Transactions</a></li>
+                <li><a href="">Statistics</a></li>
+                <li><a href="">Profile</a></li>
+            </ul>
+        </nav>
+    </aside>
+    <main>
+        <section>
+            {% block main_content %}
+            {% endblock %}
+        </section>
+    </main>
+    <footer>
+        <p>2026 Expense Tracker</p>
+    </footer>
+</body>
+
+</html>

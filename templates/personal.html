@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+
+{% block main_content %}
+
+<P>
+    Your account
+</P>
+
+<table>
+    <tr>
+        <th>Currency</th>
+        <th>Amount</th>
+        <th>Type</th>
+        <th>Category</th>
+        <th>Date</th>
+    </tr>
+
+    {% for row in content %}
+    <tr>
+        <td>{{ row["currency"] }}</td>
+        <td>{{ row["amount"] }}</td>
+        <td>{{ row["type"] }}</td>
+        <td>{{ row["category"] }}</td>
+        <td>{{ row["date"] }}</td>
+    </tr>
+    {% endfor %}
+</table>
+
+{% endblock %}

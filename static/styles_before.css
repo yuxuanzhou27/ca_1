@@ -1,0 +1,370 @@
+:root {
+    --base-color: rgb(128, 72, 81);
+    --base-bgcolor: lightgray;
+    --main-color: white;
+    --main-bgcolor: rgb(255, 255, 255, 0.3);
+}
+
+@font-face {
+    font-family: MuseoSans;
+    src: url('fonts/museisans-500-webfont.woff2')format('woff2');
+}
+
+* {
+    box-sizing: border-box;
+    background-repeat: repeat;
+}
+
+img,
+video {
+    max-width: 100%;
+    transition: all 1s;
+    overflow: hidden;
+}
+
+img:hover {
+    transform: rotate(360deg);
+    transform: scale(1.5);
+}
+
+figure {
+    position: relative;
+    width: 200px;
+    transition: all .3s;
+    border: 2px solid transparent;
+    overflow: hidden;
+}
+
+figure:hover {
+    /* transform:translate(20px,30px); */
+    border: 2px solid var(--main-color);
+}
+
+figure img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+
+}
+
+figure .mask {
+    position: absolute;
+    bottom: -30px;
+    left: 0;
+    width: 100%;
+    height: 20%;
+    color: transparent;
+    background-color: transparent;
+    transition: all .3s;
+}
+
+/* shubiaojinnguo figure,mask yidong */
+figure:hover .mask {
+    transform: translateY(-30px);
+    color: var(--base-color);
+    background-color: var(--main-color);
+}
+
+table,
+th,
+td {
+    border: 2px solid var(--main-color);
+    border-collapse: collapse;
+
+    margin: 0 auto;
+    padding: 0.5em;
+}
+
+html {
+    background-image: url('background1.jpeg');
+    background-color: var(--base-bgcolor);
+    hyphens: auto;
+}
+
+/* core CSS:colors,borders,fonts,margins,padding */
+body {
+    font-family: MuseoSans, Verdana, Geneva, Tahoma, sans-serif;
+    text-align: left;
+
+    color: var(--base-color);
+    background-color: rgba(255, 199, 213, 0.5);
+
+    margin: 0;
+
+    min-height: 100vh;
+}
+
+header {
+    background-color: rgba(255, 255, 255, 0.5);
+    color: black;
+    margin: 0.5em 0.5em 1em 0.5em;
+    border-width: 0.3em;
+    border-style: solid;
+    border-radius: 1em;
+    border-color: var(--base-color);
+    padding: 1em;
+}
+
+nav {
+    background-color: var(--main-color);
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 2px solid;
+    border-top: 2px solid;
+    border-color: rgb(128, 72, 81);
+}
+
+nav p {
+    color: var(--base-color);
+}
+
+nav a {
+    color: rgb(131, 26, 78);
+    flex: initial;
+}
+
+nav a[href=""] {
+    color: black;
+}
+
+nav a:hover,
+main>section:first-child a:hover {
+    background-color: rgb(248, 217, 235);
+}
+
+nav img {
+    border-radius: 3em;
+}
+
+main p {
+    word-spacing: 0.15em;
+    text-indent: 2em;
+    text-shadow: 1px 1px var(--main-color);
+}
+
+h2 {
+    color: rgb(87, 50, 56);
+    text-decoration-line: underline;
+}
+
+section {
+    margin: 1em;
+    border-width: 0.2em;
+    border-style: solid;
+    border-radius: 0.5em;
+    border-color: rgba(255, 255, 255, 0.5);
+    padding: 0.5em;
+
+    box-shadow: 0.5em 0.5em rgb(87, 50, 56, 0.2);
+}
+
+main>section+section>section {
+    background-color: var(--main-bgcolor);
+}
+
+footer {
+    color: black;
+    margin: 1em;
+    border-width: 0.1em;
+    border-style: solid;
+    border-radius: 1em;
+    border-color: rgb(161, 117, 140);
+    padding-left: 1em;
+
+    background-color: var(--main-bgcolor)
+}
+
+em,
+b,
+strong {
+    color: black;
+    text-shadow: none;
+
+}
+
+/* for phone layout */
+/* single column layout */
+@media screen and (min-width:400px) {
+
+    body {
+        font-size: 16px;
+    }
+
+    nav {
+        padding: 7px 20px;
+    }
+
+    nav div {
+        display: flex;
+        gap: 20px;
+    }
+
+    header {
+        /* margin-top: 70px; */
+        text-align: center;
+    }
+
+    /* menu */
+    main>section:first-child {
+        display: flex;
+        align-items: center;
+        gap: 20px;
+        background-color: rgb(255, 255, 255, 0.5);
+    }
+
+    main p+figure {
+        float: left;
+        /* height: auto; */
+        margin-right: 3em;
+    }
+
+    .last {
+        margin-bottom: 3em;
+    }
+
+    /* "my hometown is..." */
+    main>section>p {
+        padding-top: 1em;
+        text-decoration: underline;
+        margin: 0 auto;
+    }
+
+    /* "menu" */
+    main>section:first-child>p:first-child {
+        padding-top: 0;
+        padding-left: 0;
+        text-decoration: none;
+        margin: 0;
+
+
+        text-indent: 1em;
+        /* text-align: center; */
+    }
+
+    section p {
+        padding-right: 1em;
+        padding-left: 1em;
+        padding-top: 1.5em;
+    }
+
+    h2 {
+        margin-left: 0.7em;
+        margin-top: 0.5em;
+
+        scroll-margin: 80px;
+    }
+
+    article img,
+    section img {
+        width: 100px;
+        height: auto;
+    }
+
+    video {
+        width: 200px;
+        height: auto;
+        display: block;
+        margin: 0 auto;
+    }
+
+}
+
+/* two columns flex layout */
+@media screen and (min-width:600px) {
+
+    body {
+        font-size: 17px;
+
+        margin: 0;
+        display: flex;
+        flex-wrap: wrap;
+    }
+
+    nav {
+        padding: 10px 30px;
+    }
+
+    nav div {
+        display: flex;
+        gap: 25px;
+    }
+
+    header {
+        width: 100%;
+        margin-top: 80px;
+        text-align: center;
+    }
+
+    main {
+        width: 100%;
+        display: flex;
+    }
+
+    /* menu */
+    main>section:first-child {
+        position: fixed;
+        width: 20%;
+        height: fit-content;
+
+        display: flex;
+        flex-direction: column;
+        flex-wrap: wrap;
+    }
+
+    /* content */
+    main>section+section {
+        margin-left: 25%;
+        width: 75%;
+    }
+
+    footer {
+        width: 100%;
+    }
+
+    #photo+figure img {
+        width: 200px;
+        height: auto;
+    }
+
+}
+
+/* grid layout */
+@media screen and (min-width:1150px) {
+
+    body {
+        font-size: 18px;
+    }
+
+    /* header {
+        margin-top: 90px;
+    } */
+
+    /* h2 {
+        scroll-margin: 100px;
+    } */
+
+    /* content */
+    main>section+section {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 2em;
+        grid-template-areas: "top top"
+            "middle-left middle-right"
+            "bottom bottom";
+    }
+
+    main>section+section>p {
+        grid-area: top;
+    }
+
+    #photo+figure img {
+        width: 250px;
+        height: auto;
+    }
+
+}

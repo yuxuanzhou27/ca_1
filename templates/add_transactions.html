@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+
+{% block main_content %}
+
+<form action="" method="post" novalidate>
+
+    {{ form.hidden_tag() }}
+    {{ form.currency.label }}
+    {{ form.currency() }}
+    {% for error in form.currency.errors %}
+    {{ error }}
+    {% endfor %}
+    <br>
+
+    {{ form.amount.label }}
+    {{ form.amount() }}
+    {% for error in form.amount.errors %}
+    {{ error }}
+    {% endfor %}
+    <br>
+
+    {{ form.type.label }}
+    {{ form.type() }}
+    {% for error in form.type.errors %}
+    {{ error }}
+    {% endfor %}
+    <br>
+
+    {{ form.category.label }}
+    {{ form.category() }}
+    {% for error in form.category.errors %}
+    {{ error }}
+    {% endfor %}
+    <br>
+
+    {{ form.submit() }}
+
+</form>
+
+
+<p>
+    <a href="{{ url_for('personal') }}">See your account</a>
+</p>
+
+
+
+{% endblock %}
