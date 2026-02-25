@@ -8,6 +8,35 @@
     <a href="{{ url_for('add_transactions') }}">Add transactions</a>
 </p>
 
+<h2>This month {{ month }}</h2>
+
+
+{% if not budget %}
+
+<form action="{{ url_for('set_budget')}}" method="post">
+    <label for="budget">Set your budget: </label>
+    <input type="number" name="amount" step="0.01" required>
+    <button type="submit">Save</button>
+</form>
+
+{% else %}
+
+<p>
+    Budget {{ budget }}
+</p>
+<progress value="{{ percentage }}" max="100"></progress>
+<p>
+    Spent {{ expense }}
+    Remaining {{ remaining }}
+    Income {{ income }}
+</p>
+<form action="{{ url_for('set_budget')}}" method="post">
+    <label for="budget">Set your budget: </label>
+    <input type="number" name="amount" step="0.01" placeholder="Update budget">
+    <button type="submit">Update</button>
+</form>
+
+{% endif %}
 
 
 {% endblock %}

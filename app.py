@@ -26,8 +26,49 @@ def login_required(view):
     return wrapped_view
 
 @app.route("/")
+@login_required
 def index():
-    return render_template("index.html")
+    db = get_db()
+    user_id = session["user_id"]
+    
+    # this month
+    current_month = datetime.now().strftime("%Y-%m")
+
+    budget_row = db.execute("""SELECT amount 
+                                FROM budgets
+                                WHERE user_id = ?
+                                AND month = ?
+                            """, (user_id, current_month)).fetchone()
+    if budget_row:
+        budget = budget_row["amount"]
+    else:
+        budget = None
+
+    expense = db.execute("""SELECT SUM(amount) as total
+                            FROM transactions
+                            WHERE user_id = ?
+                            AND type = 'expense'
+                            AND strftime('%Y-%m', date) = ?;
+                            """, (user_id, current_month)).fetchone()["total"]
+    expense = expense if expense else 0
+    income = db.execute("""SELECT SUM(amount) as total
+                            FROM transactions
+                            WHERE user_id = ?
+                            AND type = 'income'
+                            AND strftime('%Y-%m', date) = ?;
+                            """, (user_id, current_month)).fetchone()["total"]
+    income = income if income else 0
+
+    if budget:
+        remaining = budget - expense
+        percent = (expense / budget * 100) if budget else 0
+    else:
+        remaining = 0
+        percent = 0
+
+    return render_template("index.html",
+                           budget=budget, expense=expense, income=income, remaining=remaining,
+                           percent=round(percent, 2), month=current_month)
 
 @app.route("/register", methods=["GET", "POST"])
 def register():
@@ -107,7 +148,61 @@ def add_transactions():
 @login_required
 def personal():
     db = get_db()
+    user_id = session["user_id"]
+
+    # all transactions
     content = db.execute("""SELECT * FROM transactions
-                            WHERE user_id = ?;
-                            """, (session["user_id"],)).fetchall()
+                            WHERE user_id = ?
+                            ORDER BY date DESC;
+                            """, (user_id,)).fetchall()
+    
+    # this month
+    current_month = datetime.now().strftime("%Y-%m")
+    expense = db.execute("""SELECT SUM(amount) as total
+                            FROM transactions
+                            WHERE user_id = ?
+                            AND type = 'expense'
+                            AND strftime('%Y-%m', date) = ?;
+                            """, (user_id, current_month)).fetchone()["total"]
+    income = db.execute("""SELECT SUM(amount) as total
+                            FROM transactions
+                            WHERE user_id = ?
+                            AND type = 'income'
+                            AND strftime('%Y-%m', date) = ?;
+                            """, (user_id, current_month)).fetchone()["total"]
+    expense = expense if expense else 0
+    income = income if income else 0
+
+    budget = 1000
+
+    remaining = budget - expense
+    percent = (expense / budget * 100) if budget else 0
+
     return render_template("personal.html", content=content)
+
+@app.route("/set_budget", methods=["POST"])
+@login_required
+def set_budget():
+    db = get_db()
+    user_id = session["user_id"]
+    current_month = datetime.now().strftime("%Y-%m")
+
+    amount = request.form.get("amount")
+
+    existing = db.execute("""SELECT id FROM budgets
+                            WHERE user_id = ?
+                            AND month = ?;
+                            """, (user_id, current_month)).fetchone()
+    if existing:
+        db.execute("""UPDATE budgets
+                    SET amount = ?
+                    WHERE user_id = ?
+                    AND month = ?
+                    """, (amount, user_id, current_month))
+    else:
+        db.execute("""INSERT INTO budgets (user_id, month, amount)
+                   VALUES (?, ?, ?)
+                   """, (user_id, current_month, amount))
+    db.commit()
+
+    return redirect(url_for("index"))

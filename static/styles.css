@@ -1,87 +1,88 @@
 * {
     margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-    font-family: Arial, Helvetica, sans-serif;
+    font-family: sans-serif;
 }
 
 html {
-    background-image: url('background1.jpeg');
-    background-color: lightgray;
-    ;
+    /* background-image: url('background1.jpeg'); */
+    background-color: #f5f2f2;
 }
 
-body {
-    display: grid;
-    grid-template-columns: 220px 1fr;
-    grid-template-rows: auto 1fr auto;
-    min-height: 100vh;
-    background-color: #fadbe5ab;
-}
 
 aside {
-    grid-row: 1/4;
-    background-color: #f5f1063b;
-    color: rgb(42, 10, 226);
-    padding-top: 20px;
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: 220px;
+    height: 100vh;
+    background-color: #2f2a2a;
+    color: white;
+    padding: 30px 20px;
 }
 
 aside h1 {
-    margin-top: 30px;
-    font-size: 22px;
+    margin-top: 0;
 }
 
 aside nav ul {
     list-style: none;
+    padding: 0;
+    margin-top: 30px;
 }
 
 aside nav ul li {
-    margin-bottom: 15px;
+    margin-bottom: 12px;
 }
 
-aside nav ul li a {
-    color: #000000;
+aside nav a {
+    color: #ddd;
     text-decoration: none;
 }
 
-aside nav ul li a:hover {
-    color: rgb(128, 45, 84);
+aside nav a:hover {
+    color: white;
 }
 
 header {
-    grid-column: 2;
-    padding: 20px;
-    text-align: right;
+    position: fixed;
+    right: 0;
+    top: 0;
+    left: 220px;
+    height: 60px;
+    background: white;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    padding-right: 30px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
 }
 
-.top-nav ul {
+header ul {
     list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
 }
 
-.top-nav ul li {
-    display: inline;
+header li {
     margin-left: 20px;
 }
 
-.top-nav ul li a {
+header a {
     text-decoration: none;
-    color: #1e293b;
-    font-weight: bold;
-}
-
-.top-nav ul li a:hover {
-    color: #f5f106;
-    color: #fc0542;
-}
-
-main {
-    grid-column: 2;
+    color: #444;
     padding: 40px;
 }
 
-footer {
-    grid-column: 2;
-    text-align: center;
-    padding: 15px;
-    background-color: #fc0542;
+main {
+    margin-left: 220px;
+    margin-top: 60px;
+    padding: 40px;
+}
+
+section {
+    background-color: white;
+    padding: 30px;
+    border-radius: 16px;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.05);
 }

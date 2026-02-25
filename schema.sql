@@ -17,10 +17,6 @@ VALUES
 
 
 
-
-
-
-
 DROP TABLE IF EXISTS users;
 
 CREATE TABLE users
@@ -28,3 +24,15 @@ CREATE TABLE users
     user_id TEXT PRIMARY KEY,
     password TEXT NOT NULL
 );
+
+
+DROP TABLE IF EXISTS budgets;
+
+CREATE TABLE budgets
+(
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id TEXT NOT NULL,
+    month TEXT NOT NULL,
+    amount REAL NOT NULL
+);
+
