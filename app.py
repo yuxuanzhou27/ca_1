@@ -2,7 +2,7 @@ from flask import Flask, render_template, redirect, session, url_for, g, request
 from database import get_db, close_db
 from flask_session import Session
 from werkzeug.security import generate_password_hash, check_password_hash
-from forms import LoginForm, RegistrationForm, TransactionForm
+from forms import LoginForm, RegistrationForm, TransactionForm, SavingGoalForm, AddSavingForm
 from functools import wraps
 from datetime import datetime
 
@@ -244,11 +244,16 @@ def personal():
     budget = 1000
 
     remaining = budget - expense
-    percent = (expense / budget * 100) if budget else 0
+    percentage = (expense / budget * 100) if budget else 0
 
-    
-
-    return render_template("personal.html", content=content, categories=categories)
+    return render_template("personal.html", 
+                           content=content, 
+                           categories=categories, 
+                           budget=budget, 
+                           remaining=remaining, 
+                           expense=expense,
+                           income=income, 
+                           percentage=percentage)
 
 @app.route("/set_budget", methods=["POST"])
 @login_required
@@ -325,3 +330,38 @@ def convert(amount, from_currency, to_currency):
         return amount
     rate = EXCHANGE_RATE[(from_currency, to_currency)]
     return amount * rate
+
+@app.route("/saving", methods=["GET", "POST"])
+@login_required
+def saving():
+    form = SavingGoalForm()
+    db = get_db()
+    if form.validate_on_submit():
+        goal_name = form.goal_name.data
+        target = form.target_amount.data
+        currency = form.currency.data
+
+        db.execute("""INSERT INTO saving_goals (user_id, goal_name, target_amount, current_amount, currency)
+                   VALUES (?, ?, ?, 0, ?)
+                   """, (session["user_id"], goal_name, target, currency))
+        db.commit()
+        return redirect("/saving")
+    
+    goals = db.execute("""SELECT * FROM saving_goals
+                       WHERE user_id = ?
+                       """, (session["user_id"],))
+    db.commit()
+    
+    return render_template("saving.html", goals=goals, form=form)
+
+@app.route("/add_saving/<int:goal_id>", methods=["POST"])
+@login_required
+def add_saving(goal_id):
+    amount = float(request.form.get("amount"))
+    db = get_db()
+    db.execute("""UPDATE saving_goals
+               SET current_amount = current_amount + ?
+               WHERE id = ?
+               """, (amount, goal_id))
+    db.commit()
+    return redirect("/saving")

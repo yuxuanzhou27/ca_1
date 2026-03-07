@@ -20,3 +20,13 @@ class TransactionForm(FlaskForm):
     category = SelectField("Category: ", choices=["salary","food"], default="food")
     description = StringField("Description: ")
     submit = SubmitField("Add to transactions")
+
+class SavingGoalForm(FlaskForm):
+    goal_name = StringField("Goal name: ", validators=[InputRequired()])
+    target_amount = FloatField("Target Amount: ", validators=[InputRequired()])
+    currency = SelectField("Currency: ", choices=["EUR", "CNY"], validators=[InputRequired()])
+    submit = SubmitField("Add")
+
+class AddSavingForm(FlaskForm):
+    amount = FloatField("Add Amount: ", validators=[InputRequired()])
+    submit = SubmitField("Add")

@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+
+{% block title %}
+Saving Plan
+{% endblock %}
+
+{% block main_content %}
+
+<h2>Create Saving Goal</h2>
+<br>
+<form action="" method="post">
+
+    {{ form.hidden_tag() }}
+    {{ form.goal_name.label }}
+    {{ form.goal_name() }}
+    {% for error in form.goal_name.errors %}
+    {{ error }}
+    {% endfor %}
+    
+    {{ form.target_amount.label }}
+    {{ form.target_amount() }}
+    {% for error in form.target_amount.errors %}
+    {{ error }}
+    {% endfor %}
+    <br>
+    <br>
+
+    {{ form.currency.label }}
+    {{ form.currency() }}
+    {% for error in form.currency.errors %}
+    {{ error }}
+    {% endfor %}
+    <br>
+    <br>
+
+    {{ form.submit() }}
+
+</form>
+<br>
+<h2>Your Saving Goals</h2>
+<table>
+    <tr>
+        <th>Goal</th>
+        <th>Saved</th>
+        <th>Target</th>
+        <th>Progress</th>
+        <th>Add Money</th>
+    </tr>
+    {% for goal in goals %}
+    <tr>
+        <td>{{ goal.goal_name }}</td>
+        <td>{{ goal.current_amount }}{{ goal.currency }}</td>
+        <td>{{ goal.target_amount }}{{ goal.currency }}</td>
+        <td><progress value="{{ goal.current_amount }}" max="{{ goal.target_amount }}"></progress></td>
+        <td>
+            <form action="/add_saving/{{ goal.id }}" method="post">
+                <input type="number" name="amount" step="0.01" placeholder="Amount">
+                <button type="submit">Add</button>
+            </form>
+        </td>
+    </tr>
+    {% endfor %}
+</table>
+
+{% endblock %}
+

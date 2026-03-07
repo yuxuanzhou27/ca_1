@@ -49,3 +49,11 @@ CREATE TABLE quick
 INSERT INTO quick (user_id, currency, amount, type, category)
 VALUES ('tracy', 'EUR', 200, 'income', 'salary');
 
+CREATE TABLE saving_goals (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id TEXT NOT NULL,
+    goal_name TEXT NOT NULL,
+    target_amount REAL NOT NULL,
+    current_amount REAL DEFAULT 0,
+    currency TEXT NOT NULL
+);
