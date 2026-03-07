@@ -18,4 +18,5 @@ class TransactionForm(FlaskForm):
     amount = FloatField("Amount: ", validators=[InputRequired()])
     type = SelectField("Type: ", choices=["income","expense"], default="expense")
     category = SelectField("Category: ", choices=["salary","food"], default="food")
+    description = StringField("Description: ")
     submit = SubmitField("Add to transactions")

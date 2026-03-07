@@ -2,10 +2,35 @@
 
 {% block main_content %}
 
+<h1>All Transactions</h1>
+<br>
 <section>
     <h3>
         Your transactions
     </h3>
+    <form action="" method="get">
+        <input type="text" name="q" value="{{ request.args.get('q', '') }}" placeholder="Search description">
+        <button type="submit">Search</button>
+
+        <br>
+        <br>
+
+        <label>Category</label>
+
+        <select name="category">
+            <option value="">All</option>
+
+            {% for c in categories %}
+            <option value="{{ c['category'] }}" {% if request.args.get('category')==c['category'] %} selected {% endif
+                %}>
+                {{ c["category"] }}
+            </option>
+            {% endfor %}
+
+        </select>
+        <button type="submit">Filter</button>
+    </form>
+
     <table>
         <tr>
             <th>Currency</th>
@@ -13,6 +38,7 @@
             <th>Type</th>
             <th>Category</th>
             <th>Date</th>
+            <th>Description</th>
         </tr>
 
         {% for row in content %}
@@ -22,6 +48,7 @@
             <td>{{ row["type"] }}</td>
             <td>{{ row["category"] }}</td>
             <td>{{ row["date"] }}</td>
+            <td>{{ row["description"] }}</td>
         </tr>
         {% endfor %}
     </table>

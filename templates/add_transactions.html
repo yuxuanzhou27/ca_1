@@ -2,6 +2,8 @@
 
 {% block main_content %}
 
+<h1>Add Transactions</h1>
+<br>
 <form action="" method="post" novalidate>
 
     {{ form.hidden_tag() }}
@@ -11,12 +13,14 @@
     {{ error }}
     {% endfor %}
     <br>
+    <br>
 
     {{ form.amount.label }}
     {{ form.amount() }}
     {% for error in form.amount.errors %}
     {{ error }}
     {% endfor %}
+    <br>
     <br>
 
     {{ form.type.label }}
@@ -25,12 +29,19 @@
     {{ error }}
     {% endfor %}
     <br>
+    <br>
 
     {{ form.category.label }}
     {{ form.category() }}
     {% for error in form.category.errors %}
     {{ error }}
     {% endfor %}
+    <br>
+    <br>
+
+    {{ form.description.label }}
+    {{ form.description() }}
+    <br>
     <br>
 
     {{ form.submit() }}

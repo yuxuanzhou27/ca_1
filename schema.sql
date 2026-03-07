@@ -8,13 +8,9 @@ CREATE TABLE transactions
     amount REAL NOT NULL,
     type TEXT NOT NULL,
     category TEXT NOT NULL,
-    date DATE NOT NULL
+    date DATE NOT NULL,
+    description TEXT NOT NULL
 );
-
-INSERT INTO transactions (user_id, currency, amount, type, category, date)
-VALUES
-  ('1', 'EUR', '10', 'income', 'food', 2026-2-20);
-
 
 
 DROP TABLE IF EXISTS users;
@@ -33,6 +29,23 @@ CREATE TABLE budgets
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     user_id TEXT NOT NULL,
     month TEXT NOT NULL,
+    currency TEXT NOT NULL,
     amount REAL NOT NULL
 );
+
+
+DROP TABLE IF EXISTS quick;
+
+CREATE TABLE quick
+(
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id TEXT NOT NULL,
+    currency TEXT NOT NULL,
+    amount REAL NOT NULL,
+    type TEXT NOT NULL,
+    category TEXT NOT NULL
+);
+
+INSERT INTO quick (user_id, currency, amount, type, category)
+VALUES ('tracy', 'EUR', 200, 'income', 'salary');
 

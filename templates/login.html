@@ -2,6 +2,8 @@
 
 {% block main_content %}
 
+<h1>Login</h1>
+<br>
 <form action="" method="post" novalidate>
 
     {{ form.hidden_tag() }}
@@ -11,6 +13,7 @@
     {{ error }}
     {% endfor %}
     <br>
+    <br>
 
     {{ form.password.label }}
     {{ form.password() }}
@@ -18,8 +21,14 @@
     {{ error }}
     {% endfor %}
     <br>
+    <br>
 
     {{ form.submit() }}
 
 </form>
+<br>
+<p>Don't have an account?
+    <a href="{{ url_for('register')}}">Register</a>
+</p>
+
 {% endblock %}
