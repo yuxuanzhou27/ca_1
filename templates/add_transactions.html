@@ -2,11 +2,13 @@
 
 {% block main_content %}
 
-<h1>Add Transactions</h1>
+<h2>Add Transactions</h2>
+<p>If there's no category, please add a new category below first.</p>
 <br>
 <form action="" method="post" novalidate>
 
     {{ form.hidden_tag() }}
+
     {{ form.currency.label }}
     {{ form.currency() }}
     {% for error in form.currency.errors %}
@@ -24,18 +26,19 @@
     <br>
 
     {{ form.type.label }}
-    {{ form.type() }}
+    {{ form.type(onchange="this.form.submit()") }}
     {% for error in form.type.errors %}
     {{ error }}
     {% endfor %}
     <br>
     <br>
 
-    {{ form.category.label }}
-    {{ form.category() }}
-    {% for error in form.category.errors %}
-    {{ error }}
-    {% endfor %}
+    <label>Category</label>
+    <select name="category">
+        {% for c in categories %}
+        <option value="{{ c.name }}">{{ c.name }}</option>
+        {% endfor %}
+    </select>
     <br>
     <br>
 
@@ -48,11 +51,19 @@
 
 </form>
 
-
 <p>
     <a href="{{ url_for('personal') }}">See your account</a>
 </p>
 
-
+<h4>Add a new category</h4>
+<form action="{{ url_for('add_category') }}" method="post">
+    <input type="text" name="name" placeholder="New category" required>
+    <select name="type">
+        <option value="expense">Expense</option>
+        <option value="income">Income</option>
+    </select>
+    
+    <button type="submit">Add category</button>
+</form>
 
 {% endblock %}

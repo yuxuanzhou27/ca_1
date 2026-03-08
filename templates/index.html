@@ -4,13 +4,11 @@
 
 
 <h1>Expense Tracker</h1>
-<br>
 <p>
     <a href="{{ url_for('add_transactions') }}">Add transactions</a>
 </p>
-<br>
-<br>
 <h2>This month: {{ month }}</h2>
+<p>Recording days in this month: {{ record_days }} day(s)</p>
 <br>
 
 {% if not budget %}
@@ -30,7 +28,11 @@
 <p>
     Budget: {{ budget }} EUR
 </p>
-<progress value="{{ expense }}" max="{{ budget }}"></progress>
+<div class="progress-bar">
+    <div class="progress-fill {% if percentage > 80 %}over80{% elif percentage > 50 %}over50{% else %}safe{% endif %}"
+        style="width: {{ percentage if percentage < 100 else 100 }}%">
+    </div>
+</div>
 <p>
     Total spending: {{ expense }} EUR
 </p>
@@ -55,26 +57,45 @@
 
 {% endif %}
 
-
+<div class="quick-section">
 <h3>Quick add</h3>
-<br>
+<p>Click a button below to quickly add a common transaction.</p>
+
 {% if quicks %}
+
+<h4>Income</h4>
 {% for q in quicks %}
+{% if q.type == "income" %}
 <form action="/quick_add/{{ q.id }}" method="post" style="display: inline;">
-    <button type="submit">{{ q.category }}{{ q.currency }}{{ q.amount }}</button>
+    <button type="submit">{{ q.category }} {{ q.currency }} {{ q.amount }}</button>
 </form>
-<br>
+{% endif %}
 {% endfor %}
-<br>
+
+<h4>Expenses</h4>
+{% for q in quicks %}
+{% if q.type == "expense" %}
+<form action="/quick_add/{{ q.id }}" method="post" style="display: inline;">
+    <button type="submit">{{ q.category }} {{ q.currency }} {{ q.amount }}</button>
+</form>
+{% endif %}
+{% endfor %}
+
 {% else %}
 <p>No quick templates yet.</p>
-<br>
 {% endif %}
 
+<h3>Create a Quick Template</h3>
+<p>Create a template for frequently used transactions</p>
+<p>Once created, you can add them instantly using the buttons above.</p>
+<br>
 <form action="{{ url_for('add_template') }}" method="post">
-    <input type="text" name="currency" placeholder="Currency (EUR)" required>
+    <select name="currency" required>
+        <option value="EUR">EUR</option>
+        <option value="CNY">CNY</option>
+    </select>
     <input type="number" step="0.01" name="amount" placeholder="Amount" required>
-    <select name="type">
+    <select name="type" required>
         <option value="expense">Expense</option>
         <option value="income">Income</option>
     </select>
@@ -83,3 +104,4 @@
 </form>
 
 {% endblock %}
+</div>

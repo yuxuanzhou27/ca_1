@@ -17,7 +17,7 @@ class TransactionForm(FlaskForm):
     currency = SelectField("Currency: ", choices=["EUR","CNY"], default="EUR")
     amount = FloatField("Amount: ", validators=[InputRequired()])
     type = SelectField("Type: ", choices=["income","expense"], default="expense")
-    category = SelectField("Category: ", choices=["salary","food"], default="food")
+    category = SelectField("Category: ", choices=[])
     description = StringField("Description: ")
     submit = SubmitField("Add to transactions")
 

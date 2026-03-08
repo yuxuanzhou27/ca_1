@@ -72,20 +72,26 @@ def index():
     income = round(income, 2)
 
     if budget:
-        remaining = budget - expense
-        percent = (expense / budget * 100) if budget else 0
+        remaining = max(budget - expense, 0)
+        percentage = (expense / budget * 100) if budget else 0
     else:
         remaining = 0
-        percent = 0
+        percentage = 0
 
     quicks = db.execute("""SELECT * FROM quick
                            WHERE user_id = ?
                            """, (user_id,)).fetchall()
+    
+    record_days = db.execute("""SELECT COUNT(DISTINCT date) AS days
+                             FROM transactions
+                             WHERE user_id = ?
+                             AND strftime('%Y-%m', date) = strftime('%Y-%m', 'now')
+                             """, (user_id,)).fetchone()["days"]
 
     return render_template("index.html",
                            budget=budget, expense=expense, income=income, remaining=remaining,
-                           percent=round(percent, 2), month=current_month, 
-                           quicks=quicks)
+                           percentage=round(percentage, 2), month=current_month, 
+                           quicks=quicks, record_days=record_days)
 
 @app.route("/register", methods=["GET", "POST"])
 def register():
@@ -156,6 +162,11 @@ def add_transactions():
     form = TransactionForm()
     db = get_db()
 
+    categories = db.execute("""SELECT name FROM categories
+                            WHERE user_id = ?
+                            """, (session["user_id"],)).fetchall()
+    form.category.choices = [(c["name"], c["name"]) for c in categories]
+
     if form.validate_on_submit():
         currency = form.currency.data
         amount = form.amount.data
@@ -169,7 +180,7 @@ def add_transactions():
         db.commit()
         return redirect(url_for("add_transactions"))
     
-    return render_template("add_transactions.html", form=form)
+    return render_template("add_transactions.html", form=form, categories=categories)
 
 @app.route("/personal")
 @login_required
@@ -207,12 +218,17 @@ def personal():
                             ORDER BY date DESC
                             """, (user_id,)).fetchall()
         
-    categories = db.execute("""SELECT DISTINCT category
-                            FROM transactions
+    categories = db.execute("""SELECT name
+                            FROM categories
                             WHERE user_id = ?
-                            ORDER BY category
+                            ORDER BY name
                             """, (user_id,)).fetchall()
     
+    category_list = db.execute("""SELECT DISTINCT category
+                               FROM transactions
+                               WHERE user_id = ?
+                               ORDER BY category
+                               """, (user_id,)).fetchall()
     # this month
     current_month = datetime.now().strftime("%Y-%m")
 
@@ -246,14 +262,54 @@ def personal():
     remaining = budget - expense
     percentage = (expense / budget * 100) if budget else 0
 
+    edit_id = request.args.get("edit_id")
+
     return render_template("personal.html", 
                            content=content, 
-                           categories=categories, 
+                           categories=categories,
+                           category_list=category_list, 
                            budget=budget, 
                            remaining=remaining, 
                            expense=expense,
                            income=income, 
-                           percentage=percentage)
+                           percentage=percentage,
+                           edit_id=edit_id)
+
+@app.route("/delete_transaction/<int:id>", methods=["POST"])
+@login_required
+def delete_transaction(id):
+    db = get_db()
+    user_id = session["user_id"]
+
+    db.execute("""DELETE FROM transactions
+               WHERE transaction_id = ?
+               AND user_id = ?
+               """, (id, user_id))
+    db.commit()
+
+    return redirect(url_for("personal"))
+
+@app.route("/update_transaction/<int:id>", methods=["POST"])
+@login_required
+def update_transaction(id):
+    print("FORM:", request.form)
+    print("FORM DICT:", request.form.to_dict())
+    db = get_db()
+    user_id = session["user_id"]
+
+    currency = request.form.get("currency")
+    amount = request.form.get("amount")
+    type = request.form.get("type")
+    category = request.form.get("category")
+    description = request.form.get("description")
+
+    db.execute("""UPDATE transactions
+            SET currency = ?, amount = ?, type = ?, category = ?, description = ?
+            WHERE transaction_id = ? AND user_id = ?
+               """, (currency, amount, type, category, description, id, user_id))
+    db.commit()
+
+    return redirect(url_for("personal"))
 
 @app.route("/set_budget", methods=["POST"])
 @login_required
@@ -318,7 +374,7 @@ def quick_add(template_id):
     
     template = template[0]
     
-    db.execute("""INSERT INTO transactions (user_id, currency, amount, type, category, date)
+    db.execute("""INSERT INTO transactions (user_id, currency, amount, type, category, date, description)
                VALUES(?, ?, ?, ?, ?, DATE('now'), ?)
                """, (user_id, template["currency"], template["amount"], template["type"], template["category"], "quick add"))
     db.commit()
@@ -365,3 +421,17 @@ def add_saving(goal_id):
                """, (amount, goal_id))
     db.commit()
     return redirect("/saving")
+
+@app.route("/add_category", methods=["POST"])
+@login_required
+def add_category():
+    name = request.form["name"]
+    type = request.form["type"]
+
+    db = get_db()
+    db.execute("""INSERT INTO categories (user_id, name, type)
+               VALUES (?, ?, ?)
+               """, (session["user_id"], name, type))
+    db.commit()
+
+    return redirect("/add_transactions")

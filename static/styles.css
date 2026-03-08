@@ -94,3 +94,69 @@ section {
     border-radius: 16px;
     box-shadow: 0 6px 20px rgba(0, 0, 0, 0.05);
 }
+
+.progress-bar {
+    width: 300px;
+    height: 14px;
+    background-color: #eee;
+    border-radius: 10px;
+}
+
+.progress-fill {
+    height: 100%;
+    border-radius: 10px;
+}
+
+.safe {
+    background-color: #4CAF50;
+}
+
+.over50 {
+    background-color: orange;
+}
+
+.over80 {
+    background-color: red;
+}
+
+h1 {
+    font-size: 32px;
+    margin-bottom: 20px;
+}
+
+h2 {
+    font-size: 24px;
+    margin-top: 20px;
+}
+
+h3 {
+    font-size: 20px;
+    margin-top: 25px;
+}
+
+h4 {
+    font-size: 16px;
+    margin-top: 15px;
+    color: #555;
+}
+
+button {
+    margin: 5px;
+}
+
+.quick-section {
+    margin-top: 20px;
+}
+
+p {
+    margin-left: 30px;
+    margin-top: 5px;
+}
+
+table input {
+    width: 80px;
+}
+
+table select {
+    width: 90px;
+}
