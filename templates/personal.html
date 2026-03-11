@@ -40,43 +40,46 @@
             <th>Action</th>
         </tr>
 
-    {% for row in content %}
-    <tr>
-        {% if edit_id == row['transaction_id']|string %}
-        <td colspan="7">
-            <form action="{{ url_for('update_transaction', id=row.transaction_id) }}" method="post">
-                <table>
-                <tr>
-                    <td>
-                        <select name="currency">
-                            <option value="EUR"{% if row['currency']=='EUR' %}selected{% endif %}>EUR</option>
-                            <option value="CNY"{% if row['currency']=='CNY' %}selected{% endif %}>CNY</option>
-                        </select>
-                    </td>
-                    <td><input name="amount" value="{{ row['amount'] }}"></td>
-                    <td>
-                        <select name="type">
-                            <option value="expense"{% if row['type']=='expense' %}selected{% endif %}>expense</option>
-                            <option value="income"{% if row['type']=='income' %}selected{% endif %}>income</option>
-                        </select>
-                    </td>
-                    <td>
-                        <select name="category">
-                            {% for c in categories %}
-                            <option value="{{ c['name'] }}"{% if row['category']==c['name'] %}selected{% endif %}>{{ c['name'] }}</option>
-                            {% endfor %}
-                        </select>
-                    </td>
-                    <td>{{ row['date'] }}</td>
-                    <td><input name="description" value="{{ row['description'] }}"></td>
+        {% for row in content %}
+        <tr>
+            {% if edit_id == row['transaction_id']|string %}
+            <td colspan="7">
+                <form action="{{ url_for('update_transaction', id=row.transaction_id) }}" method="post">
+                    <table>
+                        <tr>
+                            <td>
+                                <select name="currency">
+                                    <option value="EUR" {% if row['currency']=='EUR' %}selected{% endif %}>EUR</option>
+                                    <option value="CNY" {% if row['currency']=='CNY' %}selected{% endif %}>CNY</option>
+                                </select>
+                            </td>
+                            <td><input name="amount" value="{{ row['amount'] }}"></td>
+                            <td>
+                                <select name="type">
+                                    <option value="expense" {% if row['type']=='expense' %}selected{% endif %}>expense
+                                    </option>
+                                    <option value="income" {% if row['type']=='income' %}selected{% endif %}>income
+                                    </option>
+                                </select>
+                            </td>
+                            <td>
+                                <select name="category">
+                                    {% for c in categories %}
+                                    <option value="{{ c['name'] }}" {% if row['category']==c['name'] %}selected{% endif
+                                        %}>{{ c['name'] }}</option>
+                                    {% endfor %}
+                                </select>
+                            </td>
+                            <td>{{ row['date'] }}</td>
+                            <td><input name="description" value="{{ row['description'] }}"></td>
 
-                    <td>
-                        <input type="submit" value="Save">
-                    </td>
-                </tr>
-                </table>
-            </form>
-        </td>
+                            <td>
+                                <input type="submit" value="Save">
+                            </td>
+                        </tr>
+                    </table>
+                </form>
+            </td>
 
             {% else %}
             <td>{{ row["currency"] }}</td>
@@ -91,7 +94,7 @@
                     <input type="submit" value="Edit">
                 </form>
                 <form action="{{ url_for('delete_transaction', id=row['transaction_id']) }}" method="post">
-                <input type="submit" value="Delete" onclick="return confirm('Delete this transaction?')">
+                    <input type="submit" value="Delete" onclick="return confirm('Delete this transaction?')">
                 </form>
             </td>
             {% endif %}

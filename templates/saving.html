@@ -16,12 +16,6 @@ Saving Plan
     {% for error in form.goal_name.errors %}
     {{ error }}
     {% endfor %}
-    
-    {{ form.target_amount.label }}
-    {{ form.target_amount() }}
-    {% for error in form.target_amount.errors %}
-    {{ error }}
-    {% endfor %}
     <br>
     <br>
 
@@ -30,8 +24,16 @@ Saving Plan
     {% for error in form.currency.errors %}
     {{ error }}
     {% endfor %}
+
+    {{ form.target_amount.label }}
+    {{ form.target_amount() }}
+    {% for error in form.target_amount.errors %}
+    {{ error }}
+    {% endfor %}
     <br>
     <br>
+
+
 
     {{ form.submit() }}
 
@@ -53,7 +55,7 @@ Saving Plan
         <td>{{ goal.target_amount }}{{ goal.currency }}</td>
         <td><progress value="{{ goal.current_amount }}" max="{{ goal.target_amount }}"></progress></td>
         <td>
-            <form action="/add_saving/{{ goal.id }}" method="post">
+            <form action="{{ url_for('add_saving', goal_id=goal.id)}}" method="post">
                 <input type="number" name="amount" step="0.01" placeholder="Amount">
                 <button type="submit">Add</button>
             </form>
@@ -63,4 +65,3 @@ Saving Plan
 </table>
 
 {% endblock %}
-

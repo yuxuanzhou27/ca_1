@@ -47,8 +47,8 @@ CREATE TABLE quick
 );
 
 INSERT INTO quick (user_id, currency, amount, type, category)
-VALUES ('tracy', 'EUR', 200, 'income', 'salary')
-VALUES ('tracy', 'EUR', 100, 'expense', 'rent');
+VALUES ('tracy', 'EUR', 200, 'income', 'salary'),
+    ('tracy', 'EUR', 100, 'expense', 'rent');
 
 CREATE TABLE saving_goals (
     id INTEGER PRIMARY KEY AUTOINCREMENT,

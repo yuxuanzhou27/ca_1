@@ -30,11 +30,23 @@
                 <li><a href="{{ url_for('add_transactions') }}">Add Transactions</a></li>
                 <li><a href="{{ url_for('personal') }}">All Transactions</a></li>
                 <li><a href="{{ url_for('saving')}}">Saving Plan</a></li>
+                <li><a href="{{ url_for('categories') }}">Categories</a></li>
             </ul>
         </nav>
     </aside>
 
     <main>
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        <div class="flash-container">
+            {% for category, message in messages %}
+            <div class="flash {{ category }}">
+                {{ message }}
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+        {% endwith %}
         <section>
             {% block main_content %}
             {% endblock %}

@@ -1,4 +1,4 @@
-from flask import Flask, render_template, redirect, session, url_for, g, request
+from flask import Flask, render_template, redirect, session, url_for, g, request, flash
 from database import get_db, close_db
 from flask_session import Session
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -77,10 +77,6 @@ def index():
     else:
         remaining = 0
         percentage = 0
-
-    quicks = db.execute("""SELECT * FROM quick
-                           WHERE user_id = ?
-                           """, (user_id,)).fetchall()
     
     record_days = db.execute("""SELECT COUNT(DISTINCT date) AS days
                              FROM transactions
@@ -90,8 +86,7 @@ def index():
 
     return render_template("index.html",
                            budget=budget, expense=expense, income=income, remaining=remaining,
-                           percentage=round(percentage, 2), month=current_month, 
-                           quicks=quicks, record_days=record_days)
+                           percentage=round(percentage, 2), month=current_month, record_days=record_days)
 
 @app.route("/register", methods=["GET", "POST"])
 def register():
@@ -113,7 +108,14 @@ def register():
             db.execute("""INSERT INTO users (user_id, password)
                             VALUES (?, ?);
                            """, (user_id, generate_password_hash(password)))
+            
+            default_categories = [("groceries", "expense"), ("rent", "expense"), ("transport", "expense"), ("shopping", "expense"), ("salary", "income"), ("investment", "income")]
+            for name, type in default_categories:
+                db.execute("""INSERT INTO categories (user_id, name, type)
+                           VALUES (?, ?, ?)
+                           """, (user_id, name, type))
             db.commit()
+            flash("Registered successfully")
             return redirect(url_for("login", user_id=form.user_id.data))
         
     return render_template("register.html", form=form)
@@ -146,6 +148,7 @@ def login():
             next_page = request.args.get("next")
             if not next_page:
                 next_page = url_for("index")
+            flash("Logged in successfully")
             return redirect(next_page)
         
     return render_template("login.html", form=form)
@@ -167,6 +170,10 @@ def add_transactions():
                             """, (session["user_id"],)).fetchall()
     form.category.choices = [(c["name"], c["name"]) for c in categories]
 
+    quicks = db.execute("""SELECT * FROM quick
+                           WHERE user_id = ?
+                           """, (session["user_id"],)).fetchall()
+
     if form.validate_on_submit():
         currency = form.currency.data
         amount = form.amount.data
@@ -178,9 +185,11 @@ def add_transactions():
                          VALUES (?, ?, ?, ?, ?, ?, ?)
                       """,(session["user_id"], currency, amount, type, category, datetime.now().date(), description))
         db.commit()
+
+        flash("Added successfully")
         return redirect(url_for("add_transactions"))
     
-    return render_template("add_transactions.html", form=form, categories=categories)
+    return render_template("add_transactions.html", form=form, categories=categories, quicks=quicks)
 
 @app.route("/personal")
 @login_required
@@ -287,6 +296,7 @@ def delete_transaction(id):
                """, (id, user_id))
     db.commit()
 
+    flash("Deleted successfully")
     return redirect(url_for("personal"))
 
 @app.route("/update_transaction/<int:id>", methods=["POST"])
@@ -309,6 +319,7 @@ def update_transaction(id):
                """, (currency, amount, type, category, description, id, user_id))
     db.commit()
 
+    flash("Updated successfully")
     return redirect(url_for("personal"))
 
 @app.route("/set_budget", methods=["POST"])
@@ -332,10 +343,12 @@ def set_budget():
                     AND month = ?
                     AND currency = ?
                     """, (amount, user_id, current_month, currency))
+        flash("Updated successfully")
     else:
         db.execute("""INSERT INTO budgets (user_id, month, currency, amount)
                    VALUES (?, ?, ?, ?)
                    """, (user_id, current_month, currency, amount))
+        flash("Added successfully")
     db.commit()
 
     return redirect(url_for("index"))
@@ -357,7 +370,8 @@ def add_template():
                """, (user_id, currency, amount, type, category))
     db.commit()
 
-    return redirect("/")
+    flash("Added successfully")
+    return redirect(url_for("add_transactions"))
 
 # if you click this button, you can get a new trasaction
 @app.route("/quick_add/<int:template_id>", methods=["POST"])
@@ -370,7 +384,7 @@ def quick_add(template_id):
                           AND user_id = ?
                           """, (template_id, user_id)).fetchall()
     if not template:
-        return redirect("/")
+        return redirect(url_for("add_transactions"))
     
     template = template[0]
     
@@ -379,7 +393,8 @@ def quick_add(template_id):
                """, (user_id, template["currency"], template["amount"], template["type"], template["category"], "quick add"))
     db.commit()
 
-    return redirect("/")
+    flash("Added successfully")
+    return redirect(url_for("add_transactions"))
 
 def convert(amount, from_currency, to_currency):
     if from_currency == to_currency:
@@ -401,7 +416,7 @@ def saving():
                    VALUES (?, ?, ?, 0, ?)
                    """, (session["user_id"], goal_name, target, currency))
         db.commit()
-        return redirect("/saving")
+        return redirect(url_for("saving"))
     
     goals = db.execute("""SELECT * FROM saving_goals
                        WHERE user_id = ?
@@ -420,7 +435,22 @@ def add_saving(goal_id):
                WHERE id = ?
                """, (amount, goal_id))
     db.commit()
-    return redirect("/saving")
+
+    flash("Added successfully")
+    return redirect(url_for("saving"))
+
+@app.route("/categories")
+@login_required
+def categories():
+    user_id = session["user_id"]
+    db = get_db()
+
+    categories = db.execute("""SELECT id, name, type
+                            FROM categories
+                            WHERE user_id = ?
+                            ORDER BY name
+                            """, (user_id,)).fetchall()
+    return render_template("categories.html", categories=categories)
 
 @app.route("/add_category", methods=["POST"])
 @login_required
@@ -434,4 +464,51 @@ def add_category():
                """, (session["user_id"], name, type))
     db.commit()
 
-    return redirect("/add_transactions")
+    flash("Added successfully")
+    return redirect(url_for("categories"))
+
+@app.route("/delete_category/<int:id>", methods=["POST"])
+@login_required
+def delete_category(id):
+    db = get_db()
+
+    category = db.execute("""SELECT name
+                          FROM categories
+                          WHERE id = ?
+                          AND user_id = ?
+                          """, (id, session["user_id"])).fetchone()["name"]
+
+    count = db.execute("""SELECT COUNT(*) AS n
+                       FROM transactions
+                       WHERE category = ?
+                       AND user_id = ?
+                       """, (category, session["user_id"])).fetchone()["n"]
+    if count > 0:
+        flash("Category is in use and can not be deleted.")
+        return redirect(url_for(categories))
+
+    db.execute("""DELETE FROM categories
+               WHERE id = ?
+               AND user_id = ?
+               """, (id, session["user_id"]))
+    db.commit()
+
+    flash("Deleted successfully")
+    return redirect(url_for("categories"))
+
+@app.route("/update_category/<int:id>", methods=["POST"])
+@login_required
+def update_category(id):
+    name = request.form.get("name")
+    type = request.form.get("type")
+
+    db = get_db()
+    db.execute("""UPDATE categories
+               SET name = ?, type = ?
+               WHERE id = ?
+               AND user_id = ?
+               """, (name, type, id, session["user_id"]))
+    db.commit()
+
+    flash("Updated successfully")
+    return redirect(url_for("categories"))
