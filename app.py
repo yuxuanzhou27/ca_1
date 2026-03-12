@@ -30,6 +30,12 @@ def login_required(view):
         return view(*args, **kwargs)
     return wrapped_view
 
+def convert(amount, from_currency, to_currency):
+    if from_currency == to_currency:
+        return amount
+    rate = EXCHANGE_RATE[(from_currency, to_currency)]
+    return amount * rate
+
 @app.route("/")
 @login_required
 def index():
@@ -338,11 +344,10 @@ def set_budget():
                             """, (user_id, current_month)).fetchone()
     if existing:
         db.execute("""UPDATE budgets
-                    SET amount = ?
+                    SET amount = ?, currency = ?
                     WHERE user_id = ?
                     AND month = ?
-                    AND currency = ?
-                    """, (amount, user_id, current_month, currency))
+                    """, (amount, currency, user_id, current_month))
         flash("Updated successfully")
     else:
         db.execute("""INSERT INTO budgets (user_id, month, currency, amount)
@@ -396,17 +401,13 @@ def quick_add(template_id):
     flash("Added successfully")
     return redirect(url_for("add_transactions"))
 
-def convert(amount, from_currency, to_currency):
-    if from_currency == to_currency:
-        return amount
-    rate = EXCHANGE_RATE[(from_currency, to_currency)]
-    return amount * rate
-
 @app.route("/saving", methods=["GET", "POST"])
 @login_required
 def saving():
     form = SavingGoalForm()
     db = get_db()
+    filter = request.args.get("filter", "all")
+
     if form.validate_on_submit():
         goal_name = form.goal_name.data
         target = form.target_amount.data
@@ -418,12 +419,26 @@ def saving():
         db.commit()
         return redirect(url_for("saving"))
     
-    goals = db.execute("""SELECT * FROM saving_goals
-                       WHERE user_id = ?
-                       """, (session["user_id"],))
+    if filter == "completed":
+        goals = db.execute("""SELECT * 
+                        FROM saving_goals
+                        WHERE user_id = ?
+                        AND current_amount >= target_amount
+                       """, (session["user_id"],)).fetchall()
+    elif filter == "ongoing":
+        goals = db.execute("""SELECT * 
+                        FROM saving_goals
+                        WHERE user_id = ?
+                        AND current_amount < target_amount
+                       """, (session["user_id"],)).fetchall()
+    else:
+        goals = db.execute("""SELECT * 
+                        FROM saving_goals
+                        WHERE user_id = ?
+                        """, (session["user_id"],)).fetchall()
     db.commit()
     
-    return render_template("saving.html", goals=goals, form=form)
+    return render_template("saving.html", goals=goals, form=form, filter=filter)
 
 @app.route("/add_saving/<int:goal_id>", methods=["POST"])
 @login_required
@@ -439,9 +454,53 @@ def add_saving(goal_id):
     flash("Added successfully")
     return redirect(url_for("saving"))
 
-@app.route("/categories")
+@app.route("/delete_goal/<int:id>", methods=["POST"])
 @login_required
-def categories():
+def delete_goal(id):
+    db = get_db()
+
+    db.execute("""DELETE FROM saving_goals
+               WHERE id = ?
+               AND user_id = ?
+               """, (id, session["user_id"]))
+    db.commit()
+
+    flash("Deleted successfully")
+    return redirect(url_for("saving"))
+
+@app.route("/update_goal/<int:id>", methods=["POST"])
+@login_required
+def update_goal(id):
+    goal_name = request.form.get("goal_name")
+    target_amount = float(request.form.get("target_amount"))
+    currency = request.form.get("currency")
+
+    db = get_db()
+
+    row = db.execute("""SELECT currency, current_amount
+                     FROM saving_goals
+                     WHERE id = ?
+                     AND user_id = ?
+                     """, (id, session["user_id"])).fetchone()
+    old_currency = row["currency"]
+    current_amount = float(row["current_amount"])
+
+    if currency != old_currency:
+        current_amount = convert(current_amount, old_currency, currency)
+
+    db.execute("""UPDATE saving_goals
+               SET goal_name = ?, target_amount = ?, currency = ?, current_amount = ?
+               WHERE id = ?
+               AND user_id = ?
+               """, (goal_name, target_amount, currency, current_amount, id, session["user_id"]))
+    db.commit()
+
+    flash("Updated successfully")
+    return redirect(url_for("saving"))
+
+@app.route("/profile")
+@login_required
+def profile():
     user_id = session["user_id"]
     db = get_db()
 
@@ -450,7 +509,35 @@ def categories():
                             WHERE user_id = ?
                             ORDER BY name
                             """, (user_id,)).fetchall()
-    return render_template("categories.html", categories=categories)
+    
+    row = db.execute("""SELECT COUNT(*)
+                                    FROM transactions
+                                    WHERE user_id = ?
+                                    """, (user_id,)).fetchone()[0]
+    transactions_count = row if row else 0
+    
+    row = db.execute("""SELECT COUNT(*)
+                                    FROM categories
+                                    WHERE user_id = ?
+                                    """, (user_id,)).fetchone()[0]
+    categories_count = row if row else 0
+    
+    row = db.execute("""SELECT COUNT(*)
+                                    FROM quick
+                                    WHERE user_id = ?
+                                    """, (user_id,)).fetchone()[0]
+    templates_count = row if row else 0
+
+    quick = db.execute("""SELECT currency, amount, type, category
+                       FROM quick
+                       WHERE user_id = ?
+                       """, (user_id,)).fetchall()
+
+    return render_template("profile.html", categories=categories, user_id=user_id, 
+                           transactions_count=transactions_count, 
+                           categories_count=categories_count, 
+                           templates_count=templates_count, 
+                           quick=quick)
 
 @app.route("/add_category", methods=["POST"])
 @login_required
@@ -465,7 +552,7 @@ def add_category():
     db.commit()
 
     flash("Added successfully")
-    return redirect(url_for("categories"))
+    return redirect(url_for("profile"))
 
 @app.route("/delete_category/<int:id>", methods=["POST"])
 @login_required
@@ -485,7 +572,7 @@ def delete_category(id):
                        """, (category, session["user_id"])).fetchone()["n"]
     if count > 0:
         flash("Category is in use and can not be deleted.")
-        return redirect(url_for(categories))
+        return redirect(url_for(profile))
 
     db.execute("""DELETE FROM categories
                WHERE id = ?
@@ -494,7 +581,7 @@ def delete_category(id):
     db.commit()
 
     flash("Deleted successfully")
-    return redirect(url_for("categories"))
+    return redirect(url_for("profile"))
 
 @app.route("/update_category/<int:id>", methods=["POST"])
 @login_required
@@ -511,4 +598,4 @@ def update_category(id):
     db.commit()
 
     flash("Updated successfully")
-    return redirect(url_for("categories"))
+    return redirect(url_for("profile"))

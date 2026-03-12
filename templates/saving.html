@@ -1,67 +1,98 @@
 {% extends "base.html" %}
 
-{% block title %}
-Saving Plan
-{% endblock %}
-
 {% block main_content %}
 
-<h2>Create Saving Goal</h2>
-<br>
-<form action="" method="post">
+<h1>Saving Plan</h1>
+<section>
+    <h3>Create Saving Goal</h3>
+    <br>
+    <form action="" method="post">
 
-    {{ form.hidden_tag() }}
-    {{ form.goal_name.label }}
-    {{ form.goal_name() }}
-    {% for error in form.goal_name.errors %}
-    {{ error }}
-    {% endfor %}
+        {{ form.hidden_tag() }}
+        {{ form.goal_name.label }}
+        {{ form.goal_name() }}
+        {% for error in form.goal_name.errors %}
+        {{ error }}
+        {% endfor %}
+        <br>
+        <br>
+
+        {{ form.currency.label }}
+        {{ form.currency() }}
+        {% for error in form.currency.errors %}
+        {{ error }}
+        {% endfor %}
+
+        {{ form.target_amount.label }}
+        {{ form.target_amount() }}
+        {% for error in form.target_amount.errors %}
+        {{ error }}
+        {% endfor %}
+        <br>
+        <br>
+
+        {{ form.submit() }}
+
+    </form>
     <br>
     <br>
 
-    {{ form.currency.label }}
-    {{ form.currency() }}
-    {% for error in form.currency.errors %}
-    {{ error }}
-    {% endfor %}
-
-    {{ form.target_amount.label }}
-    {{ form.target_amount() }}
-    {% for error in form.target_amount.errors %}
-    {{ error }}
-    {% endfor %}
+    <h3>Your Saving Goals</h3>
     <br>
+    <form action="" method="get">
+        <label for="filter">Status: </label>
+        <select name="filter">
+            <option value="all" {% if filter=="all" %}selected{% endif %}>All goals</option>
+            <option value="completed" {% if filter=="completed" %}selected{% endif %}>Completes</option>
+            <option value="ongoing" {% if filter=="ongoing" %}selected{% endif %}>In progress</option>
+        </select>
+        <button type="submit">Filter</button>
+    </form>
+
     <br>
-
-
-
-    {{ form.submit() }}
-
-</form>
-<br>
-<h2>Your Saving Goals</h2>
-<table>
-    <tr>
-        <th>Goal</th>
-        <th>Saved</th>
-        <th>Target</th>
-        <th>Progress</th>
-        <th>Add Money</th>
-    </tr>
-    {% for goal in goals %}
-    <tr>
-        <td>{{ goal.goal_name }}</td>
-        <td>{{ goal.current_amount }}{{ goal.currency }}</td>
-        <td>{{ goal.target_amount }}{{ goal.currency }}</td>
-        <td><progress value="{{ goal.current_amount }}" max="{{ goal.target_amount }}"></progress></td>
-        <td>
-            <form action="{{ url_for('add_saving', goal_id=goal.id)}}" method="post">
-                <input type="number" name="amount" step="0.01" placeholder="Amount">
-                <button type="submit">Add</button>
-            </form>
-        </td>
-    </tr>
-    {% endfor %}
-</table>
-
+    <table>
+        <tr>
+            <th>Goal</th>
+            <th>Saved</th>
+            <th>Target</th>
+            <th>Progress</th>
+            <th>Status</th>
+            <th>Add Money</th>
+            <th>Action</th>
+        </tr>
+        {% for goal in goals %}
+        <tr>
+            <td>{{ goal.goal_name }}</td>
+            <td>{{ goal.current_amount }}{{ goal.currency }}</td>
+            <td>{{ goal.target_amount }}{{ goal.currency }}</td>
+            <td><progress value="{{ [goal.current_amount|float, goal.target_amount|float]|min }}"
+                    max="{{ goal.target_amount }}"></progress>{% if goal.target_amount|float > 0%}{{
+                ([goal.current_amount|float, goal.target_amount|float]|min / goal.target_amount|float * 100) |round(1)
+                }}%{% else %}0%{% endif %}</td>
+            <td>{% if goal.current_amount|float >= goal.target_amount|float %}Completed{% else %}In progress{% endif %}
+            </td>
+            <td>
+                <form action="{{ url_for('add_saving', goal_id=goal.id)}}" method="post">
+                    <input type="number" name="amount" step="0.01" placeholder="Amount"> {{ goal.currency }}
+                    <button type="submit">Add</button>
+                </form>
+            </td>
+            <td>
+                <form action="{{ url_for('update_goal', id = goal.id) }}" method="post" style="display: inline;">
+                    <input name="goal_name" placeholder="Name">
+                    <input name="target_amount" placeholder="Target amount">
+                    <select name="currency">
+                        <option value="EUR" {% if goal.currency=="EUR" %}selected{% endif %}>EUR</option>
+                        <option value="CNY" {% if goal.currency=="CNY" %}selected{% endif %}>CNY</option>
+                    </select>
+                    <button type="submit">Edit</button>
+                </form>
+                <form action="{{ url_for('delete_goal', id = goal.id) }}" method="post" style="display: inline;">
+                    <input type="submit" value="Delete" onclick="return confirm('Delete this saving goal?')">
+                </form>
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+</section>
 {% endblock %}

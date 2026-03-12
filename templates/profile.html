@@ -1,0 +1,106 @@
+{% extends "base.html" %}
+
+{% block main_content %}
+
+<h1>Profile</h1>
+<section>
+    <p><b>User id: </b>{{ user_id }}</p>
+    <p><b>Total transactions : </b>{{ transactions_count }}</p>
+    <p><b>Total categories: </b>{{ categories_count }}</p>
+    <p><b>Total quick templates: </b>{{ templates_count }}</p>
+    <br>
+    <h2>Category</h2>
+    <h3>Add a Category</h3>
+    <br>
+    <form action="{{ url_for('add_category') }}" method="post">
+
+        <select name="type">
+            <option value="expense">Expense</option>
+            <option value="income">Income</option>
+        </select>
+        <input name="name" placeholder="Category name" required>
+        <button type="submit">Add category</button>
+        <br>
+    </form>
+
+    <h3>Your Categories</h3>
+    <br>
+    <table>
+        <tr>
+            <th>Name</th>
+            <th>Type</th>
+            <th>Action</th>
+        </tr>
+
+        {% for c in categories %}
+        <tr>
+            <td>{{ c.name }}</td>
+            <td>{{ c.type }}</td>
+            <td>
+                <form action="{{ url_for('update_category', id = c.id) }}" method="post" style="display: inline;">
+                    <input name="name" value="{{ c.name }}">
+                    <select name="type">
+                        <option value="expense" {% if c.type=='expense' %}selected{% endif %}>Expense</option>
+                        <option value="income" {% if c.type=='income' %}selected{% endif %}>Income</option>
+                    </select>
+                    <button type="submit">Edit</button>
+                </form>
+                <form action="{{ url_for('delete_category', id = c.id) }}" method="post" style="display: inline;">
+                    <input type="submit" value="Delete" onclick="return confirm('Delete this category?')">
+                </form>
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+
+    <br>
+    <h2>Quick Template</h2>
+    <h3>Create a Quick Template</h3>
+    <p>Create a template for frequently used transactions</p>
+    <p>Once created, you can add them instantly using the buttons above.</p>
+    <br>
+    <form action="{{ url_for('add_template') }}" method="post">
+        <label for="type">Type: </label>
+        <select name="type" required>
+            <option value="expense">Expense</option>
+            <option value="income">Income</option>
+        </select>
+        <label for="currency"> Currency: </label>
+        <select name="currency" required>
+            <option value="EUR">EUR</option>
+            <option value="CNY">CNY</option>
+        </select>
+        <br>
+        <label for="category"> Category: </label>
+        <select name="category" required>
+            {% for c in categories %}
+            <option value="{{ c.name }}">{{ c.name }}</option>
+            {% endfor %}
+        </select>
+        <label for="amount"> Amount: </label>
+        <input type="number" step="1" name="amount" placeholder="Amount" required>
+        <button type="submit">Add quick template</button>
+    </form>
+
+    <h3>Your Quick Templates</h3>
+    <br>
+    <table>
+        <tr>
+            <th>Currency</th>
+            <th>Amount</th>
+            <th>Type</th>
+            <th>Category</th>
+        </tr>
+
+        {% for q in quick %}
+        <tr>
+            <td>{{ q.currency }}</td>
+            <td>{{ q.amount }}</td>
+            <td>{{ q.type }}</td>
+            <td>{{ q.category }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+</section>
+
+{% endblock %}

@@ -4,39 +4,40 @@
 
 <h1>Register</h1>
 <br>
-<form action="" method="post" novalidate>
+<section>
+    <form action="" method="post" novalidate>
 
-    {{ form.hidden_tag() }}
-    {{ form.user_id.label }}
-    {{ form.user_id() }}
-    {% for error in form.user_id.errors %}
-    {{ error }}
-    {% endfor %}
-    <br>
-    <br>
+        {{ form.hidden_tag() }}
+        {{ form.user_id.label }}
+        {{ form.user_id() }}
+        {% for error in form.user_id.errors %}
+        {{ error }}
+        {% endfor %}
+        <br>
+        <br>
 
-    {{ form.password.label }}
-    {{ form.password() }}
-    {% for error in form.password.errors %}
-    {{ error }}
-    {% endfor %}
-    <br>
-    <br>
+        {{ form.password.label }}
+        {{ form.password() }}
+        {% for error in form.password.errors %}
+        {{ error }}
+        {% endfor %}
+        <br>
+        <br>
 
-    {{ form.password2.label }}
-    {{ form.password2() }}
-    {% for error in form.password2.errors %}
-    {{ error }}
-    {% endfor %}
+        {{ form.password2.label }}
+        {{ form.password2() }}
+        {% for error in form.password2.errors %}
+        {{ error }}
+        {% endfor %}
+        <br>
+        <br>
+
+        {{ form.submit() }}
+
+    </form>
     <br>
-    <br>
-
-    {{ form.submit() }}
-
-</form>
-<br>
-<p>Already have an account?
-    <a href="{{ url_for('login')}}">Login</a>
-</p>
-
+    <p>Already have an account?
+        <a href="{{ url_for('login')}}">Login</a>
+    </p>
+</section>
 {% endblock %}

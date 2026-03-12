@@ -4,64 +4,64 @@
 
 
 <h1>Home</h1>
-<p>
-    See your account:
-    <a href="{{ url_for('add_transactions') }}">Add transactions</a>
-</p>
-<h3> This month: {{ month }}</h3>
-<br>
-<p>Recording days in this month: <b>{{ record_days }} day(s)</b></p>
-<br>
+<section>
+    <p>
+        <a href="{{ url_for('personal') }}">See your account</a>
+    </p>
+    <h3> This month: {{ month }}</h3>
+    <br>
+    <p>Recording days in this month: <b>{{ record_days }} day(s)</b></p>
+    <br>
 
-{% if not budget %}
+    {% if not budget %}
 
-<form action="{{ url_for('set_budget')}}" method="post">
-    <label for="budget">Set your budget: </label>
-    <input type="number" name="amount" step="0.01" required>
-    <select name="currency">
-        <option value="EUR">EUR</option>
-        <option value="CNY">CNY</option>
-    </select>
-    <button type="submit">Save</button>
-</form>
+    <form action="{{ url_for('set_budget')}}" method="post">
+        <label for="budget">Set your budget: </label>
+        <input type="number" name="amount" step="0.01" required>
+        <select name="currency">
+            <option value="EUR">EUR</option>
+            <option value="CNY">CNY</option>
+        </select>
+        <button type="submit">Save</button>
+    </form>
 
-{% else %}
+    {% else %}
 
-<p>
-    <b>Budget</b>: {{ budget }} EUR
-</p>
-<br>
-<p>
-    <b>Total spending</b>: {{ expense }} EUR
-</p>
-<br>
-<p>
-    <b>Remaining</b>: {{ remaining }} EUR
-</p>
-<br>
-<div class="progress-bar">
-    <div class="progress-fill {% if percentage > 80 %}over80{% elif percentage > 50 %}over50{% else %}safe{% endif %}"
-        style="width: {{ percentage if percentage < 100 else 100 }}%">
+    <p>
+        <b>Budget</b>: {{ budget }} EUR
+    </p>
+    <br>
+    <p>
+        <b>Total spending</b>: {{ expense }} EUR
+    </p>
+    <br>
+    <p>
+        <b>Remaining</b>: {{ remaining }} EUR
+    </p>
+    <br>
+    <div class="progress-bar">
+        <div class="progress-fill {% if percentage > 80 %}over80{% elif percentage > 50 %}over50{% else %}safe{% endif %}"
+            style="width: {{ percentage if percentage < 100 else 100 }}%">
+        </div>
     </div>
-</div>
-<br>
-<p>
-    <b>Income</b>: {{ income }} EUR
-</p>
-<br>
+    <br>
+    <p>
+        <b>Income</b>: {{ income }} EUR
+    </p>
+    <br>
 
-<form action="{{ url_for('set_budget')}}" method="post">
-    <label for="budget">Set your budget: </label>
-    <input type="number" name="amount" step="0.01" placeholder="Update budget">
-    <select name="currency">
-        <option value="EUR">EUR</option>
-        <option value="CNY">CNY</option>
-    </select>
-    <button type="submit">Update</button>
-</form>
-<br>
+    <form action="{{ url_for('set_budget')}}" method="post">
+        <label for="budget">Set your budget: </label>
+        <input type="number" name="amount" step="0.01" placeholder="Update budget">
+        <select name="currency">
+            <option value="EUR">EUR</option>
+            <option value="CNY">CNY</option>
+        </select>
+        <button type="submit">Update</button>
+    </form>
+    <br>
 
-{% endif %}
-
+    {% endif %}
+</section>
 
 {% endblock %}

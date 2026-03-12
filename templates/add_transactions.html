@@ -3,131 +3,90 @@
 {% block main_content %}
 
 <h1>Add Transactions</h1>
-<p>
-    <a href="{{ url_for('personal') }}">See your account</a>
-</p>
-<br>
-<br>
-
-<form action="" method="post" novalidate>
-
-    {{ form.hidden_tag() }}
-
-    {{ form.currency.label }}
-    {{ form.currency() }}
-    {% for error in form.currency.errors %}
-    {{ error }}
-    {% endfor %}
+<section>
+    <p>
+        <a href="{{ url_for('personal') }}">See your account</a>
+    </p>
     <br>
     <br>
+    <h3>Manual Entry</h3>
+    <br>
+    <form action="" method="post" novalidate>
 
-    {{ form.amount.label }}
-    {{ form.amount() }}
-    {% for error in form.amount.errors %}
-    {{ error }}
-    {% endfor %}
-    <br>
-    <br>
+        {{ form.hidden_tag() }}
 
-    {{ form.type.label }}
-    {{ form.type(onchange="this.form.submit()") }}
-    {% for error in form.type.errors %}
-    {{ error }}
-    {% endfor %}
-    <br>
-    <br>
-
-    <label>Category</label>
-    <select name="category">
-        {% for c in categories %}
-        <option value="{{ c.name }}">{{ c.name }}</option>
+        {{ form.currency.label }}
+        {{ form.currency() }}
+        {% for error in form.currency.errors %}
+        {{ error }}
         {% endfor %}
-    </select>
-    <br>
-    <br>
-
-    {{ form.description.label }}
-    {{ form.description() }}
-    <br>
-    <br>
-
-    {{ form.submit() }}
-
-</form>
-
-<!-- <br>
-<h4>Add a new category</h4>
-<br>
-<form action="{{ url_for('add_category') }}" method="post">
-    <label for="type">Type: </label>
-    <select name="type">
-        <option value="expense">Expense</option>
-        <option value="income">Income</option>
-    </select>
-    <label for="name">Name: </label>
-    <input type="text" name="name" placeholder="New category name" required>
-    <button type="submit">Add category</button>
-</form>
-<br> -->
-<br>
-
-
-<div class="quick-section">
-    <h2>Quick add</h2>
-    <br>
-    <p>Click a button below to quickly add a common transaction.</p>
-
-    {% if quicks %}
-
-    <h4>Income</h4>
-    {% for q in quicks %}
-    {% if q.type == "income" %}
-    <form action="{{ url_for('quick_add', template_id=q.id)}}" method="post" style="display: inline;">
-        <button type="submit">{{ q.category }} {{ q.currency }} {{ q.amount }}</button>
-    </form>
-    {% endif %}
-    {% endfor %}
-
-    <h4>Expenses</h4>
-    {% for q in quicks %}
-    {% if q.type == "expense" %}
-    <form action="{{ url_for('quick_add', template_id=q.id)}}" method="post" style="display: inline;">
-        <button type="submit">{{ q.category }} {{ q.currency }} {{ q.amount }}</button>
-    </form>
-    {% endif %}
-    {% endfor %}
-
-    {% else %}
-    <p>No quick templates yet.</p>
-    {% endif %}
-
-    <br>
-    <h4>Create a Quick Template</h4>
-    <p>Create a template for frequently used transactions</p>
-    <p>Once created, you can add them instantly using the buttons above.</p>
-    <br>
-    <form action="{{ url_for('add_template') }}" method="post">
-        <label for="type">Type: </label>
-        <select name="type" required>
-            <option value="expense">Expense</option>
-            <option value="income">Income</option>
-        </select>
-        <label for="currency"> Currency: </label>
-        <select name="currency" required>
-            <option value="EUR">EUR</option>
-            <option value="CNY">CNY</option>
-        </select>
         <br>
-        <label for="category"> Category: </label>
-        <select name="category" required>
+        <br>
+
+        {{ form.amount.label }}
+        {{ form.amount() }}
+        {% for error in form.amount.errors %}
+        {{ error }}
+        {% endfor %}
+        <br>
+        <br>
+
+        {{ form.type.label }}
+        {{ form.type(onchange="this.form.submit()") }}
+        {% for error in form.type.errors %}
+        {{ error }}
+        {% endfor %}
+        <br>
+        <br>
+
+        <label>Category</label>
+        <select name="category">
             {% for c in categories %}
             <option value="{{ c.name }}">{{ c.name }}</option>
             {% endfor %}
         </select>
-        <label for="amount"> Amount: </label>
-        <input type="number" step="1" name="amount" placeholder="Amount" required>
-        <button type="submit">Add quick template</button>
-    </form>
-</div>
+        <br>
+        <br>
 
+        {{ form.description.label }}
+        {{ form.description() }}
+        <br>
+        <br>
+
+        {{ form.submit() }}
+
+    </form>
+    <br>
+
+    <div class="quick-section">
+        <h3>Quick add</h3>
+        <br>
+        <p>Click a button below to quickly add a common transaction.</p>
+
+        {% if quicks %}
+
+        <h4>Income</h4>
+        {% for q in quicks %}
+        {% if q.type == "income" %}
+        <form action="{{ url_for('quick_add', template_id=q.id)}}" method="post" style="display: inline;">
+            <button type="submit">{{ q.category }} {{ q.currency }} {{ q.amount }}</button>
+        </form>
+        {% endif %}
+        {% endfor %}
+
+        <h4>Expenses</h4>
+        {% for q in quicks %}
+        {% if q.type == "expense" %}
+        <form action="{{ url_for('quick_add', template_id=q.id)}}" method="post" style="display: inline;">
+            <button type="submit">{{ q.category }} {{ q.currency }} {{ q.amount }}</button>
+        </form>
+        {% endif %}
+        {% endfor %}
+
+        {% else %}
+        <br>
+        <p><b>No quick templates yet. Add quick templates in Profile</b></p>
+        {% endif %}
+    </div>
+</section>
 {% endblock %}
